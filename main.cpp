@@ -4,6 +4,19 @@
 
 bool ConvertToRoman(std::string input, std::string &output) {
 	bool result = false;
+	int arabic = 0;
+
+	arabic = atoi(input.c_str());
+
+	if (arabic <= 0) {
+		std::cout << "Arabic number must be greater than zero" << std::endl;
+		return false;
+	} else if (arabic > 9999) {
+		std::cout << "Arabic number must be less or equal 9999" << std::endl;
+		return false;
+	}
+
+	
 
 	return result;
 }
