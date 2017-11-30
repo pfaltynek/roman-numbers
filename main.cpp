@@ -1,9 +1,10 @@
+#include <fstream>
 #include <iostream>
 #include <regex>
 #include <string>
 #include <vector>
 
-#define TEST 0
+#define TEST 1
 
 class NumberConvertInfo {
   public:
@@ -64,20 +65,33 @@ bool ConvertToArabic(std::string input, std::string &output) {
 	bool result = true;
 	int arabic = 0;
 	int cnt = 0;
-	int idx = 0;
+	unsigned int idx = 0;
 	std::vector<NumberConvertInfo>::iterator it;
 	std::string tmp;
 	it = table.begin();
-	
-	/*
+
 	while ((idx < input.size()) && (result)) {
 		tmp = input.substr(idx, it->roman.size());
-		if (tmp.compare)
-	}*/
+		if (tmp.compare(it->roman) == 0) {
+			arabic += it->arabic;
+			idx += it->roman.size();
+			cnt++;
+			if (cnt > it->max_roman_count) {
+				result = false;
+				std::cout << "Unknown problem (counter)" << std::endl;
+			}
+		} else {
+			it++;
+			cnt = 0;
+			if (it == table.end()) {
+				result = false;
+				std::cout << "Unknown problem (table end)" << std::endl;
+			}
+		}
+	}
 
 	output = std::to_string(arabic);
 
-	std::cout << "Roman number in invalid format" << std::endl;
 	return result;
 }
 
@@ -99,9 +113,58 @@ void PrepareConvertTable() {
 }
 
 void RunSelfTest() {
+	std::vector<std::string> test_area(10000);
+	std::string in, out;
+	bool test_ok = true;
+
 	std::cout << "Starting selftest ... please wait" << std::endl;
 
+	test_area[0] = "";
+	for (int i = 1; i <= 9999; i++) {
+		in = std::to_string(i);
+		if (ConvertToRoman(in, out)) {
+			test_area[i] = out;
+		} else {
+			std::cout << "Failed to convert " << i << "to roman" << std::endl;
+			test_ok = false;
+			break;
+		}
+	}
+
+	if (test_ok) {
+		for (int i = 1; i <= 9999; i++) {
+			in = test_area[i];
+			if (ConvertToArabic(in, out)) {
+				if (out.compare(std::to_string(i)) != 0) {
+					test_ok = false;
+				}
+			} else {
+				test_ok = false;
+			}
+			if (!test_ok) {
+				std::cout << "Failed to convert " << i << "from roman (" << in << ")" << std::endl;
+				break;
+			}
+		}
+	}
+
 	std::cout << "Self test finished." << std::endl;
+
+	if (test_ok) {
+		std::ofstream data_out;
+
+		data_out.open("data.txt", std::ofstream::out);
+
+		if (data_out.fail()) {
+			std::cout << "Test data export failed." << std::endl;
+			return;
+		}
+
+		for (int i = 1; i <= 9999; i++) {
+			data_out << std::to_string(i) << "," << test_area[i] << std::endl;
+		}
+		data_out.close();
+	}
 }
 
 int main(int argc, char *argv[]) {

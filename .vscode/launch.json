@@ -16,7 +16,7 @@
 				"program": "${workspaceFolder}/roman-numbers.exe",
 				"miDebuggerPath": "gdb.exe"
 			},
-			"args": ["MCIX"],
+			"args": ["--test"],
 			"stopAtEntry": false,
 			"cwd": "${workspaceFolder}",
 			"environment": [],
